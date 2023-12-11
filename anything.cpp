@@ -43,11 +43,11 @@ public:
     
     else if(scan->ranges[60] <= 0.20)
     {
-      vel.linear.x = 0.;
-      vel.angular.z = 1.5;
+      vel.linear.x = 0.15;
+      vel.angular.z = 0.005;
     }
     
-    else if(scan->ranges[90] <= 0.20 || !(scan->ranges[60] <= 0.20))
+    else if(scan->ranges[90] <= 0.20 && !(scan->ranges[60] <= 0.20))
     {
       vel.linear.x = 0.1;
       vel.angular.z = 1.5;
