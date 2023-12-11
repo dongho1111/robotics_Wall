@@ -1,3 +1,4 @@
+
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -32,37 +33,70 @@ public:
   {
     geometry_msgs::msg::Twist vel;
 
-    vel.linear.x = 0.2;
-    vel.angular.z = 0.0;
+    vel.linear.x = 0.20;
+    vel.angular.z = 0.;
 
-    if (scan->ranges[0] <= 0.25 || scan->ranges[20] <= 0.25)
+    switch (detectObstacleType(scan))
     {
+      case 1:
       vel.linear.x = 0.;
-      vel.angular.z = -1.5;
-    }
-   
-    else if(scan->ranges[60] <= 0.25)
-    {
+      vel.angular.z = -1.6;
+      break;
+
+      case 2:
       vel.linear.x = 0.15;
-      vel.angular.z = -0.0001;
+      vel.angular.z = -0.005;
+      break;
+
+      case 3:
+      vel.linear.x = 0.15;
+      vel.angular.z = 0.8;
+      break;
+
+      case 4:
+      vel.linear.x = 0.1;
+      vel.angular.z = 1.6;
+      break;
+
+      case 5:
+       vel.linear.x = 0.20;
+      vel.angular.z = 0.;
+      break;
+
+      default:
+      vel.linear.x = 0.20;
+      vel.angular.z = 0.;
     }
-    else if(scan->ranges[90] <= 0.20 && !(scan->ranges[60] <= 0.25))
-    {
-      vel.linear.x = 0.;
-      vel.angular.z = 1.5;
-    }
-    
-      else if(scan->ranges[130] <= 0.20)
-    {
-      vel.linear.x = 0.;
-      vel.angular.z = 2.0;
-    }
-    
+
     RCLCPP_INFO(rclcpp::get_logger("self_drive"),
                 "step=%d, range=%1.2f, linear=%1.2f, angular=%1.2f", step_, scan->ranges[0],
                 vel.linear.x, vel.angular.z);
     pose_pub_->publish(vel);
     step_++;
+  }
+
+  int detectObstacleType(const sensor_msgs::msg::LaserScan::SharedPtr scan)
+  {
+    if ((scan->ranges[0] > 0.01 && scan->ranges[0] <= 0.22) || (scan->ranges[20] > 0.01 && scan->ranges[20] <= 0.22))
+    {
+      return 1;
+    }
+    else if((scan->ranges[30] > 0.03 && scan->ranges[30] <= 0.22) || (scan->ranges[50] > 0.03 && scan->ranges[50] <= 0.22))
+    {
+      return 2;
+    }
+    else if((scan->ranges[60] > 0.01 && scan->ranges[60] <= 0.22)|| (scan->ranges[80] > 0.01 && scan->ranges[80] <= 0.22))
+    {
+      return 3;
+    }
+    else if(scan->ranges[90] > 0.01 && scan->ranges[90] <= 0.17)
+    {
+       return 4;
+    }
+    else
+    {
+      return 5;
+    }
   }
 };
 
@@ -74,4 +108,3 @@ int main(int argc, char* argv[])
   rclcpp::shutdown();
   return 0;
 }
-
