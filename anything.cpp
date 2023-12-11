@@ -46,7 +46,7 @@ public:
       vel.linear.x = 0.15;
       vel.angular.z = -0.0001;
     }
-    else if(scan->ranges[90] <= 0.20)
+    else if(scan->ranges[90] <= 0.20 && !(scan->ranges[60] <= 0.25))
     {
       vel.linear.x = 0.;
       vel.angular.z = 1.5;
